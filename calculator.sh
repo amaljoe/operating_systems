@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [ $# -ge 2 ]
 then
     a=$1
@@ -18,7 +20,7 @@ do
     then
         o=$3
     else
-        echo "\nEnter your option (a- add, s- subtract, m -multiply, d- division):"
+        echo "Enter your option (a- add, s- subtract, m -multiply, d- division):"
         read o
     fi
     flag="stop"

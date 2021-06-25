@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/types.h>
 
 int main() {
     printf("WELCOME TO SIMPLE CALCULATOR, my pid = %d\n\n", getpid());
     // fork will return 0 to child process and pid of child process to parent process.
     // if fork failed, it will return a negative number
-    int f = fork();
+    pid_t f = fork();
     if(f == 0) {
         // child will execute this block of code
         execlp("./calculator.sh", "calculator.sh", NULL);
