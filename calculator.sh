@@ -8,11 +8,12 @@ else
     echo "Enter second number:"
     read b
 fi
+# possible values of flag = start | restart | stop
 flag="start"
 # prompt the user untill he enters a correct option
 while [ $flag != "stop" ]
 do
-    # if operator is provided as argument, take that
+    # if operator is provided as argument, take that and make sure its a valid operator
     if [ $# -ge 3 -a $flag != "restart" ]
     then
         o=$3
@@ -21,6 +22,7 @@ do
         read o
     fi
     flag="stop"
+    # menu driven program to find sum, difference, product, quotient and remainder
     case $o in
         a) echo "Sum after addition: " `expr $a + $b`;;
         s) echo "Difference after subtraction: " `expr $a - $b`;;
