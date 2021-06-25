@@ -23,7 +23,7 @@ do
     flag="stop"
     case $o in
         a) echo "Sum after addition: " `expr $a + $b`;;
-        s) echo "Difference after subtracttion: " `expr $a - $b`;;
+        s) echo "Difference after subtraction: " `expr $a - $b`;;
         m) echo "Product after multiplication: " `expr $a \* $b`;;
         d) echo "Quotient after division: " `expr $a / $b` "     Reminder: " `expr $a % $b`;;
         *) echo "Invalid option, try again!!"

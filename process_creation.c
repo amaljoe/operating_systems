@@ -3,7 +3,7 @@
 #include <sys/wait.h>
 
 int main() {
-    printf("WELCOME TO SIMPLE CALCULATOR\n\n");
+    printf("WELCOME TO SIMPLE CALCULATOR, my pid = %d\n\n", getpid());
     // fork will return 0 to child process and pid of child process to parent process.
     // if fork failed, it will return a negative number
     int f = fork();
