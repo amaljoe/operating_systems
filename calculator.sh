@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# if operands are provided as arguments, use that or else read it from the user
 if [ $# -ge 2 ]
 then
     a=$1
@@ -15,7 +16,7 @@ flag="start"
 # prompt the user untill he enters a correct option
 while [ $flag != "stop" ]
 do
-    # if operator is provided as argument, take that and make sure its a valid operator
+    # if operator is provided as argument, use that and make sure its a valid operator
     if [ $# -ge 3 -a $flag != "restart" ]
     then
         o=$3
