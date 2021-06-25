@@ -29,7 +29,7 @@ do
         a) echo "Sum after addition: " `expr $a + $b`;;
         s) echo "Difference after subtraction: " `expr $a - $b`;;
         m) echo "Product after multiplication: " `expr $a \* $b`;;
-        d) echo "Quotient after division: " `expr $a / $b` "     Reminder: " `expr $a % $b`;;
+        d) echo "Quotient after division: " `expr $a / $b` "     Remainder: " `expr $a % $b`;;
         *) echo "Invalid option, try again!!"
         # if option is invalid, loop again
         flag="restart";;
