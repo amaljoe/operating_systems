@@ -11,6 +11,9 @@ typedef struct Process
     int at;
     int bt;
     int priority;
+
+    int wt;
+    int tat;
 } Process;
 
 Process p[MAX];
@@ -63,17 +66,15 @@ void input(bool get_priority)
 {
     if (DEV)
     {
-        size = 5;
-        Process p0 = {0, 1, 7, 1};
-        Process p1 = {1, 2, 5, 1};
-        Process p2 = {2, 3, 1, 1};
-        Process p3 = {3, 4, 2, 1};
-        Process p4 = {3, 5, 8, 1};
+        size = 4;
+        Process p0 = {0, 0, 13, 1};
+        Process p1 = {1, 2, 9, 1};
+        Process p2 = {2, 2, 5, 1};
+        Process p3 = {3, 3, 7, 1};
         p[0] = p0;
         p[1] = p1;
         p[2] = p2;
         p[3] = p3;
-        p[4] = p4;
         return;
     }
 
@@ -140,8 +141,10 @@ void fcfs()
             }
             else
             {
+                p[i].wt--;
                 total_wt++;
             }
+            p[i].tat--;
             total_tat++;
         }
         if (completed >= size)
@@ -192,6 +195,14 @@ void sjf()
                 {
                     shortest = &p[i];
                 }
+                else if (shortest == NULL || p[i].bt == shortest->bt)
+                {
+                    // Tie breaker for SJF is arrival time
+                    if (p[i].at < shortest->at)
+                    {
+                        shortest = &p[i];
+                    }
+                }
             }
 
             if (active == &p[i])
@@ -200,14 +211,17 @@ void sjf()
             }
             else
             {
+                p[i].wt++;
                 total_wt++;
             }
+            p[i].tat++;
             total_tat++;
         }
         if (active == NULL && shortest != NULL)
         {
             active = shortest;
             active->bt--;
+            active->wt--;
             total_wt--;
         }
         if (completed >= size)
@@ -220,11 +234,78 @@ void sjf()
     avg_wt = total_wt / size;
     avg_tat = total_tat / size;
 }
+
 void round_robin(int time_slice)
 {
-    avg_wt = 1;
-    avg_tat = 3;
+    int t = 0;
+    double total_wt = 0;
+    double total_tat = 0;
+    int completed = 0;
+    Process *active = NULL;
+    int ts = time_slice;
+    while (true)
+    {
+        int n = 0;
+        // if the active process is completed or if its time slice is over, remove it
+        if (active != NULL && active->bt <= 0 || ts <= 0)
+        {
+            n = active->num + 1;
+            printf("p%d exiting at %d", n, t);
+            active = NULL;
+            ts = time_slice;
+        }
+        completed = 0;
+        int i = n % size;
+        do
+        {
+            if (p[i].bt <= 0)
+            {
+                // process already completed
+                printf("inactive, already finished\n");
+                completed++;
+                i = ++i % size;
+                continue;
+            }
+            if (t < p[i].at)
+            {
+                // process yet to arrive
+                printf("inactive, yet to come %d %d\n", t, p[i].at);
+                i = ++i % size;
+                continue;
+            }
+            printf("already came and is not finished\n");
+            // if no process is running, run the current process
+            if (active == NULL)
+            {
+                active = &p[i];
+            }
+            if (active == &p[i])
+            {
+                // this process is running
+                p[i].bt--;
+                ts--;
+            }
+            else
+            {
+                // this process is waiting
+                p[i].wt--;
+                total_wt++;
+            }
+            p[i].tat--;
+            total_tat++;
+            i = ++i % size;
+        } while (i != n);
+        if (completed >= size)
+        {
+            break;
+        }
+        t++;
+        printf("\n");
+    }
+    avg_wt = total_wt / size;
+    avg_tat = total_tat / size;
 }
+
 void priority()
 {
     avg_wt = 1;
