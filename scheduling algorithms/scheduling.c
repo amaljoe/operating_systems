@@ -3,7 +3,8 @@
 #include <stdbool.h>
 
 #define MAX 10
-#define DEV true
+// set DEV to true for predefined inputs
+#define DEV false
 
 typedef struct Process
 {
@@ -33,6 +34,7 @@ int main()
     int ch;
     printf("\nEnter your scheduling algorithm choice:\n1. FCFS 2. SJF 3. Round Robin 4. Priority\n");
     scanf("%d", &ch);
+    // menu driven program
     switch (ch)
     {
     case 1:
@@ -64,6 +66,7 @@ int main()
 
 void input(bool get_priority)
 {
+    // predefined inputs for development
     if (DEV)
     {
         size = 5;
@@ -91,6 +94,7 @@ void input(bool get_priority)
         scanf("%d", &temp.at);
         printf("Enter the burst time of p%d:\n", i);
         scanf("%d", &temp.bt);
+        // only input priority for priority scheduling algorithm
         if (get_priority)
         {
             printf("Enter the priority of p%d:\n", i);
@@ -111,7 +115,7 @@ void fcfs()
     double total_tat = 0;
     int completed = 0;
     Process *active = NULL;
-    // loop over every processes at all instances of time
+    // loop over every process at all instances of time
     while (true)
     {
         if (active != NULL && active->bt <= 0)
@@ -151,7 +155,7 @@ void fcfs()
             p[i].tat++;
             total_tat++;
         }
-        // if all processes completed, stop
+        // if all processes are completed, stop
         if (completed >= size)
         {
             break;
@@ -169,7 +173,7 @@ void sjf()
     double total_tat = 0;
     int completed = 0;
     Process *active = NULL;
-    // loop over every processes at all instances of time
+    // loop over every process at all instances of time
     while (true)
     {
         if (active != NULL && active->bt <= 0)
@@ -223,6 +227,7 @@ void sjf()
             p[i].tat++;
             total_tat++;
         }
+        // if no process is running, run the shortest process
         if (active == NULL && shortest != NULL)
         {
             active = shortest;
@@ -230,6 +235,7 @@ void sjf()
             active->wt--;
             total_wt--;
         }
+        // if all processes are completed, stop
         if (completed >= size)
         {
             break;
@@ -248,11 +254,11 @@ void round_robin(int time_slice)
     int completed = 0;
     Process *active = NULL;
     int ts = time_slice;
-    // loop over every processes at all instances of time
+    // loop over every process at all instances of time
     while (true)
     {
         int n = 0;
-        // if the active process is completed or if its time slice is over, remove it
+        // if the running process is completed or if its time slice is over, remove it
         if (active != NULL && active->bt <= 0 || ts <= 0)
         {
             n = (active->id + 1) % size;
@@ -313,12 +319,12 @@ void priority()
     double total_tat = 0;
     int completed = 0;
     Process *active = NULL;
-    // loop over every processes at all instances of time
+    // loop over every process at all instances of time
     while (true)
     {
+        // if running process is complete, remove it
         if (active != NULL && active->bt <= 0)
         {
-            printf("p%d exiting at %d\n", active->id + 1, t);
             active = NULL;
         }
         completed = 0;
