@@ -7,7 +7,7 @@
 
 typedef struct Process
 {
-    int num;
+    int id;
     int at;
     int bt;
     int priority;
@@ -66,15 +66,17 @@ void input(bool get_priority)
 {
     if (DEV)
     {
-        size = 4;
-        Process p0 = {0, 0, 13, 1};
-        Process p1 = {1, 2, 9, 1};
-        Process p2 = {2, 2, 5, 1};
-        Process p3 = {3, 3, 7, 1};
+        size = 5;
+        Process p0 = {0, 0, 8, 4};
+        Process p1 = {1, 2, 6, 1};
+        Process p2 = {2, 2, 1, 2};
+        Process p3 = {3, 1, 9, 2};
+        Process p4 = {4, 3, 3, 3};
         p[0] = p0;
         p[1] = p1;
         p[2] = p2;
         p[3] = p3;
+        p[4] = p4;
         return;
     }
 
@@ -84,7 +86,7 @@ void input(bool get_priority)
     for (int i = 0; i < size; i++)
     {
         Process temp;
-        temp.num = i;
+        temp.id = i;
         printf("Enter the arrival time of p%d:\n", i);
         scanf("%d", &temp.at);
         printf("Enter the burst time of p%d:\n", i);
@@ -109,6 +111,7 @@ void fcfs()
     double total_tat = 0;
     int completed = 0;
     Process *active = NULL;
+    // loop over every processes at all instances of time
     while (true)
     {
         if (active != NULL && active->bt <= 0)
@@ -120,39 +123,40 @@ void fcfs()
         {
             if (p[i].bt <= 0)
             {
-                printf("inactive, already finished\n");
+                // process already completed
                 completed++;
                 continue;
             }
             if (t < p[i].at)
             {
-
-                printf("inactive, yet to come\n");
+                // process yet to arrive
                 continue;
             }
-            printf("already came and is not finished\n");
+            // if no processes are running, run this process
             if (active == NULL)
             {
                 active = &p[i];
             }
             if (active == &p[i])
             {
+                // process is running
                 p[i].bt--;
             }
             else
             {
-                p[i].wt--;
+                // process is waiting
+                p[i].wt++;
                 total_wt++;
             }
-            p[i].tat--;
+            p[i].tat++;
             total_tat++;
         }
+        // if all processes completed, stop
         if (completed >= size)
         {
             break;
         }
         t++;
-        printf("\n");
     }
     avg_wt = total_wt / size;
     avg_tat = total_tat / size;
@@ -165,6 +169,7 @@ void sjf()
     double total_tat = 0;
     int completed = 0;
     Process *active = NULL;
+    // loop over every processes at all instances of time
     while (true)
     {
         if (active != NULL && active->bt <= 0)
@@ -177,40 +182,41 @@ void sjf()
         {
             if (p[i].bt <= 0)
             {
-                printf("inactive, already finished\n");
+                // process already completed
                 completed++;
                 continue;
             }
             if (t < p[i].at)
             {
 
-                printf("inactive, yet to come\n");
+                // process yet to arrive
                 continue;
             }
-
-            printf("already came and is not finished\n");
+            // if no process is running, run the shortest process in the queue
             if (active == NULL)
             {
+                // find the process with shortest burst time
                 if (shortest == NULL || p[i].bt < shortest->bt)
                 {
                     shortest = &p[i];
                 }
                 else if (shortest == NULL || p[i].bt == shortest->bt)
                 {
-                    // Tie breaker for SJF is arrival time
+                    // if burst time is equal, tie breaker for SJF is arrival time
                     if (p[i].at < shortest->at)
                     {
                         shortest = &p[i];
                     }
                 }
             }
-
             if (active == &p[i])
             {
+                // process is running
                 p[i].bt--;
             }
             else
             {
+                // process is waiting
                 p[i].wt++;
                 total_wt++;
             }
@@ -229,7 +235,6 @@ void sjf()
             break;
         }
         t++;
-        printf("\n");
     }
     avg_wt = total_wt / size;
     avg_tat = total_tat / size;
@@ -243,64 +248,59 @@ void round_robin(int time_slice)
     int completed = 0;
     Process *active = NULL;
     int ts = time_slice;
+    // loop over every processes at all instances of time
     while (true)
     {
         int n = 0;
         // if the active process is completed or if its time slice is over, remove it
         if (active != NULL && active->bt <= 0 || ts <= 0)
         {
-            n = active->num + 1;
-            printf("p%d exiting at %d", n, t);
+            n = (active->id + 1) % size;
             active = NULL;
             ts = time_slice;
         }
         completed = 0;
-        int i = n % size;
-        do
+        bool flag = true;
+        for (int i = n; i != n || flag; i = ++i % size)
         {
+            flag = false;
             if (p[i].bt <= 0)
             {
                 // process already completed
-                printf("inactive, already finished\n");
                 completed++;
-                i = ++i % size;
                 continue;
             }
             if (t < p[i].at)
             {
                 // process yet to arrive
-                printf("inactive, yet to come %d %d\n", t, p[i].at);
-                i = ++i % size;
                 continue;
             }
-            printf("already came and is not finished\n");
-            // if no process is running, run the current process
+            // if no process is running, run this process
             if (active == NULL)
             {
                 active = &p[i];
             }
             if (active == &p[i])
             {
-                // this process is running
-                p[i].bt--;
+                // running process
                 ts--;
+                p[i].bt--;
             }
             else
             {
-                // this process is waiting
-                p[i].wt--;
+                // waiting process
+                p[i].wt++;
                 total_wt++;
             }
-            p[i].tat--;
+            p[i].tat++;
             total_tat++;
-            i = ++i % size;
-        } while (i != n);
+        }
+        // if all processes are completed, stop
         if (completed >= size)
         {
             break;
         }
         t++;
-        printf("\n");
     }
     avg_wt = total_wt / size;
     avg_tat = total_tat / size;
@@ -308,12 +308,87 @@ void round_robin(int time_slice)
 
 void priority()
 {
-    avg_wt = 1;
-    avg_tat = 3;
+    int t = 0;
+    double total_wt = 0;
+    double total_tat = 0;
+    int completed = 0;
+    Process *active = NULL;
+    // loop over every processes at all instances of time
+    while (true)
+    {
+        if (active != NULL && active->bt <= 0)
+        {
+            printf("p%d exiting at %d\n", active->id + 1, t);
+            active = NULL;
+        }
+        completed = 0;
+        Process *highest_priority = NULL;
+        for (int i = 0; i < size; i++)
+        {
+            if (p[i].bt <= 0)
+            {
+                // process already completed
+                completed++;
+                continue;
+            }
+            if (t < p[i].at)
+            {
+
+                // process yet to arrive
+                continue;
+            }
+            // if no process is running, run the shortest process in the queue
+            if (active == NULL)
+            {
+                // find the process with highest priority (low value = high priority)
+                if (highest_priority == NULL || p[i].priority < highest_priority->priority)
+                {
+                    highest_priority = &p[i];
+                }
+                else if (highest_priority == NULL || p[i].bt == highest_priority->bt)
+                {
+                    // if burst time is equal, tie breaker for SJF is arrival time
+                    if (p[i].at < highest_priority->at)
+                    {
+                        highest_priority = &p[i];
+                    }
+                }
+            }
+            if (active == &p[i])
+            {
+                // process is running
+                p[i].bt--;
+            }
+            else
+            {
+                // process is waiting
+                p[i].wt++;
+                total_wt++;
+            }
+            p[i].tat++;
+            total_tat++;
+        }
+        // if no process is running, run the highest priority process
+        if (active == NULL && highest_priority != NULL)
+        {
+            active = highest_priority;
+            active->bt--;
+            active->wt--;
+            total_wt--;
+        }
+        // if all processes are completed, stop
+        if (completed >= size)
+        {
+            break;
+        }
+        t++;
+    }
+    avg_wt = total_wt / size;
+    avg_tat = total_tat / size;
 }
 
 void output()
 {
-    printf("\nAverage waiting time: %f\n", avg_wt);
-    printf("Average turn around time: %f\n", avg_tat);
+    printf("\nAverage waiting time: %.2f\n", avg_wt);
+    printf("Average turn around time: %.2f\n", avg_tat);
 }
