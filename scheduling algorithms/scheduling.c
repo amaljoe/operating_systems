@@ -351,9 +351,9 @@ void priority()
                 {
                     highest_priority = &p[i];
                 }
-                else if (highest_priority == NULL || p[i].bt == highest_priority->bt)
+                else if (highest_priority == NULL || p[i].priority == highest_priority->priority)
                 {
-                    // if burst time is equal, tie breaker for SJF is arrival time
+                    // if priority is equal, tie breaker is arrival time
                     if (p[i].at < highest_priority->at)
                     {
                         highest_priority = &p[i];
