@@ -10,7 +10,7 @@
 
 #define MAX 5
 
-// to identify the errors occured during runtime
+// to identify the errors occurred during runtime
 extern int errno;
 
 struct data
@@ -24,7 +24,7 @@ int main()
 {
     bool new = true;
     // create shared memory if it doesnt exist
-    // shm_open will return 1 if shared memory exists since we are using O_CREAT and O_EXCL flags together
+    // shm_open will return -1 if shared memory exists since we are using O_CREAT and O_EXCL flags together
     int fd = shm_open("/shared", O_CREAT | O_RDWR | O_EXCL, 0777);
     if (fd == -1 && errno == EEXIST)
     {
