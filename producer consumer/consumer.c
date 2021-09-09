@@ -44,26 +44,27 @@ int main()
         sem_init(&(d->full), 10, 0);
         sem_init(&(d->empty), 10, MAX);
     }
+
     while (true)
     {
+        int y;
         int x;
-        sem_getvalue(&(d->full), &x);
+        sem_getvalue(&(d->empty), &x);
         if (x == MAX)
         {
-            printf("Buffer full\n");
+            printf("Buffer empty\n");
             //exit(0);
         }
-        // Produce
-        int y = rand() % 100;
-        // Add element to the buffer
-        sem_wait(&(d->empty));
+        // Remove element from the buffer
+        sem_wait(&(d->full));
         sem_wait(&(d->mutex));
-        d->buffer[d->index] = y;
-        d->index++;
+        y = d->buffer[d->index - 1];
+        d->index--;
         sem_post(&(d->mutex));
-        sem_post(&(d->full));
-        // Print a message and sleep for 1s
-        printf("Putting %d\n", y);
+        sem_post(&(d->empty));
+        // Consume
+        printf("Got %d\n", y);
+        // Sleep for 1s
         sleep(1);
     }
 }
