@@ -53,7 +53,11 @@ int main()
         }
     }
     display();
-    safety();
+    bool success = safety();
+    if (!success)
+    {
+        return 1;
+    }
     while (true)
     {
         char choice;
@@ -164,6 +168,7 @@ bool resource_req(int p, int request[])
         printf("Request cannot be granted immediately since request is exceeding the current available resources.\n\n", p);
         return false;
     }
+    // assume the request is granted
     for (int i = 0; i < m; i++)
     {
         available[i] -= request[i];
@@ -171,17 +176,22 @@ bool resource_req(int p, int request[])
         need[p][i] -= request[i];
     }
     display();
+    // check if the new state has a safety sequence
     bool success = safety();
     if (success)
     {
         printf("Request can be granted immediately since safe sequence can be generated.\n\n", p);
         return true;
     }
-    else
+    // restore old state if request cannot be granted
+    for (int i = 0; i < m; i++)
     {
-        printf("Request cannot be granted immediately since safe sequence cannot be generated.\n\n", p);
-        return false;
+        available[i] += request[i];
+        alloc[p][i] -= request[i];
+        need[p][i] += request[i];
     }
+    printf("Request cannot be granted immediately since safe sequence cannot be generated.\n\n", p);
+    return false;
 }
 
 void display()
