@@ -11,8 +11,8 @@ int need[MAX_PROCESS][MAX_REQUEST];
 // n - no of process, m - no of resources
 int n, m;
 
-void safety();
-void resource_req(int, int[]);
+bool safety();
+bool resource_req(int, int[]);
 void display();
 bool isLessThan(int[], int[]);
 
@@ -72,11 +72,12 @@ int main()
         {
             scanf("%d", &request[i]);
         }
+        resource_req(process, request);
     }
     return 0;
 }
 
-void safety()
+bool safety()
 {
     int work[MAX_REQUEST];
     int finish[MAX_PROCESS];
@@ -128,11 +129,13 @@ void safety()
         {
             printf("p%d ", sequence[i]);
         }
-        printf("\n");
+        printf("\n\n");
+        return true;
     }
     else
     {
         printf("Safe sequence does not exist\n");
+        return false;
     }
 }
 
@@ -147,6 +150,38 @@ bool isLessThan(int a1[], int a2[])
         }
     }
     return true;
+}
+
+bool resource_req(int p, int request[])
+{
+    if (!isLessThan(request, need[p]))
+    {
+        printf("Request cannot be granted immediately since request is exceeding the maximum allocatable resource for the process p%d.\n\n", p);
+        return false;
+    }
+    if (!isLessThan(request, available))
+    {
+        printf("Request cannot be granted immediately since request is exceeding the current available resources.\n\n", p);
+        return false;
+    }
+    for (int i = 0; i < m; i++)
+    {
+        available[i] -= request[i];
+        alloc[p][i] += request[i];
+        need[p][i] -= request[i];
+    }
+    display();
+    bool success = safety();
+    if (success)
+    {
+        printf("Request can be granted immediately since safe sequence can be generated.\n\n", p);
+        return true;
+    }
+    else
+    {
+        printf("Request cannot be granted immediately since safe sequence cannot be generated.\n\n", p);
+        return false;
+    }
 }
 
 void display()
@@ -193,4 +228,12 @@ void display()
 2 2 2
 0 0 2
 4 3 3
+y
+1
+1 0 2
+y
+4
+3 3 0
+n
+
 */
