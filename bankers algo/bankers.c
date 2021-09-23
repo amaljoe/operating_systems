@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdbool.h>
+
 #define MAX_PROCESS 10
 #define MAX_REQUEST 5
 
@@ -10,8 +12,9 @@ int need[MAX_PROCESS][MAX_REQUEST];
 int n, m;
 
 void safety();
-void resource_req(int[]);
+void resource_req(int, int[]);
 void display();
+bool isLessThan(int[], int[]);
 
 int main()
 {
@@ -50,12 +53,105 @@ int main()
         }
     }
     display();
+    safety();
+    while (true)
+    {
+        char choice;
+        printf("Do you want to request a resource? (y/n)\n");
+        scanf(" %c", &choice);
+        if (choice != 'y')
+        {
+            break;
+        }
+        int process;
+        int request[MAX_REQUEST];
+        printf("Enter process number:\n");
+        scanf("%d", &process);
+        printf("Enter resources required (r1, r2, r3...):\n");
+        for (int i = 0; i < m; i++)
+        {
+            scanf("%d", &request[i]);
+        }
+    }
     return 0;
+}
+
+void safety()
+{
+    int work[MAX_REQUEST];
+    int finish[MAX_PROCESS];
+
+    // sequence array will store the generated safe sequence
+    int sequence[MAX_REQUEST];
+    int seq_index = -1;
+
+    // initialise finish to false
+    for (int i = 0; i < n; i++)
+    {
+        finish[i] = false;
+    }
+    // initialise work to available
+    for (int i = 0; i < m; i++)
+    {
+        work[i] = available[i];
+    }
+    // loop through all process untill it stops execution
+    while (true)
+    {
+        // if atleast one process executes in one complete cycle, set flag to true
+        bool flag = false;
+        for (int i = 0; i < n; i++)
+        {
+            if (isLessThan(need[i], work) && finish[i] == false)
+            {
+                flag = true;
+                // work = work + allocated[i] because after the process completes, it will release its allocated resources
+                for (int j = 0; j < m; j++)
+                {
+                    work[j] += alloc[i][j];
+                }
+                finish[i] = true;
+                sequence[++seq_index] = i;
+            }
+        }
+        // if no process executed in the current cycle, break out of the loop
+        if (!flag)
+        {
+            break;
+        }
+    }
+    // if all processes completes its execution, length of safe sequence will be equal to no of process
+    if (seq_index + 1 == n)
+    {
+        printf("Safe sequence exists:\n");
+        for (int i = 0; i < n; i++)
+        {
+            printf("p%d ", sequence[i]);
+        }
+        printf("\n");
+    }
+    else
+    {
+        printf("Safe sequence does not exist\n");
+    }
+}
+
+// check if a1 array has all elements less than or equal to corresponding elements of a2 array
+bool isLessThan(int a1[], int a2[])
+{
+    for (int i = 0; i < m; i++)
+    {
+        if (a1[i] > a2[i])
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 void display()
 {
-    printf("Process\tAllocated\tMax\tNeed\n");
+    printf("\nProcess\tAllocated\tMax\tNeed\n");
     for (int i = 0; i < n; i++)
     {
         printf("p%d\t", i);
@@ -75,18 +171,26 @@ void display()
         }
         printf("\n");
     }
+    printf("\nAvailable\n");
+    for (int i = 0; i < m; i++)
+    {
+        printf("%d ", available[i]);
+    }
+    printf("\n\n");
 }
 
 /*
-4
+5
 3
-1 2 3
-1 2 3
-2 3 4
-1 2 3
-2 3 4
-1 2 3
-2 3 4
-1 2 3
-2 3 4
+3 3 2
+0 1 0
+7 5 3
+2 0 0
+3 2 2
+3 0 2
+9 0 2
+2 1 1
+2 2 2
+0 0 2
+4 3 3
 */
