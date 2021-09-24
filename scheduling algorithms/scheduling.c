@@ -4,7 +4,7 @@
 
 #define MAX 10
 // set DEV to true for predefined inputs
-#define DEV false
+#define DEV true
 
 typedef struct Process
 {
@@ -22,12 +22,19 @@ int size;
 double avg_wt;
 double avg_tat;
 
+Process *queue[MAX];
+int rear = -1;
+int front = -1;
+
 void fcfs();
 void sjf();
 void round_robin(int);
+void round_robin2(int);
 void priority();
 void input(bool);
 void output();
+bool insert(Process *);
+Process *delete ();
 
 int main()
 {
@@ -50,7 +57,7 @@ int main()
         int ts;
         printf("\nEnter the time slice:\n");
         scanf("%d", &ts);
-        round_robin(ts);
+        round_robin2(ts);
         break;
     case 4:
         input(true);
@@ -69,17 +76,19 @@ void input(bool get_priority)
     // predefined inputs for development
     if (DEV)
     {
-        size = 5;
-        Process p0 = {0, 0, 8, 4};
-        Process p1 = {1, 2, 6, 1};
-        Process p2 = {2, 2, 1, 2};
-        Process p3 = {3, 1, 9, 2};
-        Process p4 = {4, 3, 3, 3};
+        size = 6;
+        Process p0 = {1, 0, 5, 0};
+        Process p1 = {2, 1, 6, 0};
+        Process p2 = {3, 2, 3, 0};
+        Process p3 = {4, 3, 1, 0};
+        Process p4 = {5, 4, 5, 0};
+        Process p5 = {6, 6, 4, 0};
         p[0] = p0;
         p[1] = p1;
         p[2] = p2;
         p[3] = p3;
         p[4] = p4;
+        p[5] = p5;
         return;
     }
 
@@ -300,6 +309,116 @@ void round_robin(int time_slice)
             }
             p[i].tat++;
             total_tat++;
+        }
+        // if all processes are completed, stop
+        if (completed >= size)
+        {
+            break;
+        }
+        t++;
+    }
+    avg_wt = total_wt / size;
+    avg_tat = total_tat / size;
+}
+
+bool insert(Process *pr)
+{
+    if (front == (rear + 1) % MAX)
+    {
+        return false;
+    }
+    if (front == -1)
+    {
+        front = 0;
+    }
+    rear = (rear + 1) % MAX;
+    queue[rear] = pr;
+    return true;
+}
+
+Process *delete ()
+{
+    if (front == -1)
+    {
+        return NULL;
+    }
+    Process *pr = queue[front];
+    queue[front] = NULL;
+    if (front == rear)
+    {
+        front = -1;
+        rear = -1;
+    }
+    else
+    {
+        front = (front + 1) % MAX;
+    }
+    return pr;
+}
+
+void round_robin2(int time_slice)
+{
+    int t = 0;
+    double total_wt = 0;
+    double total_tat = 0;
+    int completed = 0;
+    Process *active = NULL;
+    int ts = time_slice;
+    // loop over every process at all instances of time
+    while (true)
+    {
+        int n = 0;
+        completed = 0;
+        bool flag = true;
+        for (int i = n; i != n || flag; i = ++i % size)
+        {
+            flag = false;
+            if (p[i].bt <= 0)
+            {
+                // process already completed
+                completed++;
+                continue;
+            }
+            if (t < p[i].at)
+            {
+                // process yet to arrive
+                continue;
+            }
+            // if process just arrived, put it in ready queue
+            if (p[i].at == t)
+            {
+                insert(&p[i]);
+            }
+
+            p[i].wt++;
+            total_wt++;
+            p[i].tat++;
+            total_tat++;
+        }
+        // if the running process is completed or if its time slice is over, remove it
+        if (active != NULL && active->bt <= 0 || ts <= 0)
+        {
+            // if process is pending put in ready queue
+            if (active->bt > 0)
+            {
+                insert(active);
+            }
+            n = (active->id + 1) % size;
+            active = NULL;
+            ts = time_slice;
+        }
+        // if no process is running, run the first process in ready queue
+        if (active == NULL)
+        {
+            active = delete();
+        }
+        if (active != NULL)
+        {
+            // running process
+            ts--;
+            active->bt--;
+            active->wt--;
+            total_wt--;
         }
         // if all processes are completed, stop
         if (completed >= size)

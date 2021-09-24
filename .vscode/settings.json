@@ -2,6 +2,7 @@
     "files.associations": {
         "*.tcc": "c",
         "unistd.h": "c",
-        "mman.h": "c"
+        "mman.h": "c",
+        "cstdlib": "c"
     }
 }
