@@ -29,7 +29,6 @@ int front = -1;
 void fcfs();
 void sjf();
 void round_robin(int);
-void round_robin2(int);
 void priority();
 void input(bool);
 void output();
@@ -57,7 +56,7 @@ int main()
         int ts;
         printf("\nEnter the time slice:\n");
         scanf("%d", &ts);
-        round_robin2(ts);
+        round_robin(ts);
         break;
     case 4:
         input(true);
@@ -255,72 +254,6 @@ void sjf()
     avg_tat = total_tat / size;
 }
 
-void round_robin(int time_slice)
-{
-    int t = 0;
-    double total_wt = 0;
-    double total_tat = 0;
-    int completed = 0;
-    Process *active = NULL;
-    int ts = time_slice;
-    // loop over every process at all instances of time
-    while (true)
-    {
-        int n = 0;
-        // if the running process is completed or if its time slice is over, remove it
-        if (active != NULL && active->bt <= 0 || ts <= 0)
-        {
-            n = (active->id + 1) % size;
-            active = NULL;
-            ts = time_slice;
-        }
-        completed = 0;
-        bool flag = true;
-        for (int i = n; i != n || flag; i = ++i % size)
-        {
-            flag = false;
-            if (p[i].bt <= 0)
-            {
-                // process already completed
-                completed++;
-                continue;
-            }
-            if (t < p[i].at)
-            {
-                // process yet to arrive
-                continue;
-            }
-            // if no process is running, run this process
-            if (active == NULL)
-            {
-                active = &p[i];
-            }
-            if (active == &p[i])
-            {
-                // running process
-                ts--;
-                p[i].bt--;
-            }
-            else
-            {
-                // waiting process
-                p[i].wt++;
-                total_wt++;
-            }
-            p[i].tat++;
-            total_tat++;
-        }
-        // if all processes are completed, stop
-        if (completed >= size)
-        {
-            break;
-        }
-        t++;
-    }
-    avg_wt = total_wt / size;
-    avg_tat = total_tat / size;
-}
-
 bool insert(Process *pr)
 {
     if (front == (rear + 1) % MAX)
@@ -356,7 +289,7 @@ Process *delete ()
     return pr;
 }
 
-void round_robin2(int time_slice)
+void round_robin(int time_slice)
 {
     int t = 0;
     double total_wt = 0;
