@@ -4,7 +4,7 @@
 
 #define MAX 10
 // set DEV to true for predefined inputs
-#define DEV true
+#define DEV false
 
 typedef struct Process
 {
