@@ -1,7 +1,8 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <stdio.h>
-using namespace std;
+
+#define MAX 100
 
 int main()
 {
@@ -15,7 +16,7 @@ int main()
     char *str = (char *)shmat(shmid, (void *)0, 0);
 
     printf("Write Data : ");
-    fgets(str);
+    fgets(str, MAX, stdin);
 
     printf("Data written in memory: %s\n", str);
 
