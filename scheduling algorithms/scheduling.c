@@ -343,7 +343,7 @@ void round_robin(int time_slice)
         // if no process is running, run the first process in ready queue
         if (active == NULL)
         {
-            active = delete();
+            active = delete ();
         }
         if (active != NULL)
         {
@@ -395,7 +395,7 @@ void priority()
                 // process yet to arrive
                 continue;
             }
-            // if no process is running, run the shortest process in the queue
+            // if no process is running, run the highest priority process in the queue
             if (active == NULL)
             {
                 // find the process with highest priority (low value = high priority)
