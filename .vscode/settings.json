@@ -3,6 +3,7 @@
         "*.tcc": "c",
         "unistd.h": "c",
         "mman.h": "c",
-        "cstdlib": "c"
+        "cstdlib": "c",
+        "string": "c"
     }
 }
