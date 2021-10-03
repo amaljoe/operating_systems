@@ -159,7 +159,7 @@ int find_lru(int index)
     for (int i = 0; i < frames_size; i++)
     {
         nearest[i] = -1;
-        for (int j = index - 1; j > 0; j--)
+        for (int j = index - 1; j >= 0; j--)
         {
             if (ref[j] == frames[i])
             {
