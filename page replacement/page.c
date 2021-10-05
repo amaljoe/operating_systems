@@ -15,7 +15,7 @@ int ch;
 
 void allocate(int, int);
 void page_replacement();
-int find_fcfs(int);
+int find_fifo(int);
 int find_optimal(int);
 int find_lru(int);
 
@@ -48,7 +48,7 @@ void page_replacement()
         switch (ch)
         {
         case 1:
-            index = find_fcfs(ref[i]);
+            index = find_fifo(ref[i]);
             break;
         case 2:
             index = find_optimal(i);
@@ -85,7 +85,7 @@ void allocate(int index, int page)
     printf("\n");
 }
 
-int find_fcfs(int page)
+int find_fifo(int page)
 {
     // check if page exists
     for (int i = 0; i < frames_size; i++)
